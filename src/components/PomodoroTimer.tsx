@@ -3,11 +3,19 @@ import './PomodoroTimer.css';
 
 type TimerMode = 'focus' | 'rest';
 
+interface Task {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+
 const PomodoroTimer: React.FC = () => {
   const [mode, setMode] = useState<TimerMode>('focus');
   const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes in seconds
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTaskText, setNewTaskText] = useState('');
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const focusTime = 25 * 60; // 25 minutes
@@ -77,6 +85,30 @@ const PomodoroTimer: React.FC = () => {
     setIsRunning(false);
     setIsPaused(false);
     setTimeLeft(newMode === 'focus' ? focusTime : restTime);
+  };
+
+  // Task management functions
+  const addTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newTaskText.trim()) {
+      const newTask: Task = {
+        id: Date.now().toString(),
+        text: newTaskText.trim(),
+        completed: false
+      };
+      setTasks([...tasks, newTask]);
+      setNewTaskText('');
+    }
+  };
+
+  const toggleTask = (taskId: string) => {
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    ));
+  };
+
+  const deleteTask = (taskId: string) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
   };
 
   useEffect(() => {
@@ -156,14 +188,50 @@ const PomodoroTimer: React.FC = () => {
           <button className="start-button" onClick={toggleTimer}>
             {isRunning && !isPaused ? 'Pause ⏸️' : 'Start ▶️'}
           </button>
-          <button className="reset-button" onClick={resetTimer}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-              <path d="M21 3v5h-5"/>
-              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-              <path d="M3 21v-5h5"/>
-            </svg>
+        </div>
+      </div>
+
+      {/* Task List Section */}
+      <div className="task-section">
+        {/* <h3 className="task-title">Tasks 📝</h3> */}
+        
+        {/* Add Task Form */}
+        <form onSubmit={addTask} className="task-form">
+          <input
+            type="text"
+            value={newTaskText}
+            onChange={(e) => setNewTaskText(e.target.value)}
+            placeholder="Add a new task..."
+            className="task-input"
+          />
+          <button type="submit" className="add-task-button">
+            ➕
           </button>
+        </form>
+
+        {/* Task List */}
+        <div className="task-list">
+          {tasks.length === 0 ? (
+            <p className="no-tasks">No tasks yet. Add one above! ✨</p>
+          ) : (
+            tasks.map(task => (
+              <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+                <button
+                  className="task-checkbox"
+                  onClick={() => toggleTask(task.id)}
+                >
+                  {task.completed ? '✔️' : '⭕'}
+                </button>
+                <span className="task-text">{task.text}</span>
+                <button
+                  className="delete-task-button"
+                  onClick={() => deleteTask(task.id)}
+                >
+                  🗑️
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
