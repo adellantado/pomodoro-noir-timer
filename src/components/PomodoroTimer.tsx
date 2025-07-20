@@ -130,6 +130,9 @@ const PomodoroTimer: React.FC = () => {
     setIsTaskInputExpanded(true);
   };
 
+  // Find the topmost incomplete task
+  const topmostIncompleteTaskIndex = tasks.findIndex(task => !task.completed);
+
   // Drag and drop functions
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
     e.dataTransfer.setData('text/plain', taskId);
@@ -346,7 +349,8 @@ const PomodoroTimer: React.FC = () => {
                   className="task-checkbox"
                   onClick={() => toggleTask(task.id)}
                 >
-                  {task.completed ? '✔️' : '⭕'}
+                  {task.completed ? '✔️' : 
+                    tasks.indexOf(task) === topmostIncompleteTaskIndex ? '🕓' : '⭕️'}
                 </button>
                 <div className="task-content">
                   <span className="task-text">{task.text}</span>
