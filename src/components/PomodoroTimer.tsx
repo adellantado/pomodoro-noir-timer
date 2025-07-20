@@ -150,6 +150,19 @@ const PomodoroTimer: React.FC = () => {
     }
   }, []);
 
+  // Update browser title with timer
+  useEffect(() => {
+    const title = isRunning && !isPaused 
+      ? mode === 'focus'
+        ? `▶︎ ${formatTime(timeLeft)} - Focus 🍅`
+        : `▶︎ ${formatTime(timeLeft)} - Break 🍅`
+      : isPaused 
+        ? `|| ${formatTime(timeLeft)} - Paused 🍅`
+        : `${formatTime(timeLeft)} - Idle 🍅`;
+    
+    document.title = title;
+  }, [timeLeft, isRunning, isPaused]);
+
   return (
     <div className="pomodoro-container">
       {/* Header */}
@@ -168,13 +181,13 @@ const PomodoroTimer: React.FC = () => {
             className={`mode-button ${mode === 'focus' ? 'active' : ''}`}
             onClick={() => switchMode('focus')}
           >
-            Focus 💡
+            Focus
           </button>
           <button
             className={`mode-button ${mode === 'rest' ? 'active' : ''}`}
             onClick={() => switchMode('rest')}
           >
-            Break 💤
+            Break
           </button>
         </div>
 
