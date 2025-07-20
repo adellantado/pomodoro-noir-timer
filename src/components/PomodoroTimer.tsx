@@ -7,6 +7,8 @@ interface Task {
   id: string;
   text: string;
   completed: boolean;
+  estimatedTimers?: number;
+  project?: string;
 }
 
 const PomodoroTimer: React.FC = () => {
@@ -16,10 +18,16 @@ const PomodoroTimer: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskText, setNewTaskText] = useState('');
+  const [isTaskInputExpanded, setIsTaskInputExpanded] = useState(false);
+  const [estimatedTimers, setEstimatedTimers] = useState(1);
+  const [selectedProject, setSelectedProject] = useState('');
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const focusTime = 25 * 60; // 25 minutes
   const restTime = 5 * 60; // 5 minutes
+
+  // Sample projects - you can expand this
+  const projects = ['Work', 'Study', 'Personal', 'Health', 'Learning', 'Other'];
 
   // Function to play notification sound
   const playNotificationSound = useCallback(() => {
@@ -94,10 +102,15 @@ const PomodoroTimer: React.FC = () => {
       const newTask: Task = {
         id: Date.now().toString(),
         text: newTaskText.trim(),
-        completed: false
+        completed: false,
+        estimatedTimers: estimatedTimers,
+        project: selectedProject || undefined
       };
       setTasks([...tasks, newTask]);
       setNewTaskText('');
+      setEstimatedTimers(1);
+      setSelectedProject('');
+      setIsTaskInputExpanded(false);
     }
   };
 
@@ -109,6 +122,10 @@ const PomodoroTimer: React.FC = () => {
 
   const deleteTask = (taskId: string) => {
     setTasks(tasks.filter(task => task.id !== taskId));
+  };
+
+  const handleTaskInputClick = () => {
+    setIsTaskInputExpanded(true);
   };
 
   useEffect(() => {
@@ -213,10 +230,32 @@ const PomodoroTimer: React.FC = () => {
             onChange={(e) => setNewTaskText(e.target.value)}
             placeholder="Add a new task..."
             className="task-input"
+            onClick={handleTaskInputClick}
           />
-          <button type="submit" className="add-task-button">
-            ➕
-          </button>
+          {isTaskInputExpanded && newTaskText.trim() && (
+            <div className="task-input-expanded">
+              <input
+                type="number"
+                value={estimatedTimers}
+                onChange={(e) => setEstimatedTimers(Number(e.target.value))}
+                placeholder="Estimated timers"
+                className="estimated-timers-input"
+              />
+              <select
+                value={selectedProject}
+                onChange={(e) => setSelectedProject(e.target.value)}
+                className="project-select"
+              >
+                <option value="">Select a project</option>
+                {projects.map(project => (
+                  <option key={project} value={project}>{project}</option>
+                ))}
+              </select>
+              <button type="submit" className="add-task-button">
+                ➕
+              </button>
+            </div>
+          )}
         </form>
 
         {/* Task List */}
@@ -232,7 +271,19 @@ const PomodoroTimer: React.FC = () => {
                 >
                   {task.completed ? '✔️' : '⭕'}
                 </button>
-                <span className="task-text">{task.text}</span>
+                <div className="task-content">
+                  <span className="task-text">{task.text}</span>
+                  {(task.estimatedTimers || task.project) && (
+                    <div className="task-meta">
+                      {task.estimatedTimers && (
+                        <span className="task-estimate">🍅 {task.estimatedTimers}</span>
+                      )}
+                      {task.project && (
+                        <span className="task-project">📁 {task.project}</span>
+                      )}
+                    </div>
+                  )}
+                </div>
                 <button
                   className="delete-task-button"
                   onClick={() => deleteTask(task.id)}
