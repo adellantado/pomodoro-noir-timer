@@ -1,0 +1,231 @@
+.pomodoro-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem;
+  background-color: #000000;
+  color: #ffffff;
+  position: relative;
+}
+
+/* Header */
+.header {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 10;
+}
+
+.brand-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+  text-transform: lowercase;
+}
+
+.brand-subtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.8;
+  text-transform: lowercase;
+}
+
+/* Timer Section */
+.timer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 2rem;
+}
+
+/* Mode Buttons */
+.mode-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mode-button {
+  padding: 0.75rem 2rem;
+  border-radius: 2rem;
+  border: 1px solid #ffffff;
+  background-color: transparent;
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+}
+
+.mode-button.active {
+  background-color: #333333;
+  border-color: #333333;
+}
+
+.mode-button:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Timer Display */
+.timer-display {
+  margin: 2rem 0;
+}
+
+.timer-text {
+  font-size: 8rem;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.start-button {
+  padding: 1rem 3rem;
+  border-radius: 2rem;
+  border: none;
+  background-color: #333333;
+  color: #ffffff;
+  font-size: 3rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+}
+
+.start-button:hover {
+  background-color: #444444;
+}
+
+.reset-button {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  background-color: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.reset-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Footer */
+.footer {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10;
+}
+
+.sparkle-icon {
+  font-size: 1rem;
+  color: #ffd700;
+}
+
+.icon-button {
+  font-size: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: unset;
+  background-color: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.icon-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pomodoro-container {
+    padding: 1rem;
+  }
+  
+  .header {
+    top: 1rem;
+    left: 1rem;
+  }
+  
+  .brand-title {
+    font-size: 2rem;
+  }
+  
+  .brand-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .timer-text {
+    font-size: 5rem;
+  }
+  
+  .mode-button {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .start-button {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+  }
+  
+  .footer {
+    bottom: 1rem;
+    right: 1rem;
+    gap: 0.5rem;
+  }
+  
+  .icon-button {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .timer-text {
+    font-size: 4rem;
+  }
+  
+  .mode-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+} 
