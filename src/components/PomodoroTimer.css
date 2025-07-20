@@ -178,6 +178,7 @@
 }
 
 .task-input-expanded {
+  align-items: center;
   display: flex;
   gap: 0.5rem;
   animation: slideDown 0.3s ease-out;
@@ -195,6 +196,7 @@
 }
 
 .estimated-timers-input {
+  max-width: 100px;
   flex: 1;
   padding: 0.5rem;
   border: 1px solid #333333;
@@ -215,6 +217,110 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+.estimated-timers-container {
+  flex: 1;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.estimated-timers-label-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.estimated-timers-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.timer-control-btn {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #333333;
+  border-radius: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.timer-control-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+}
+
+.timer-control-btn:active {
+  transform: scale(0.95);
+}
+
+.estimated-timers-label {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.estimated-timers-input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #333333;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease;
+  text-align: center;
+  min-width: 3rem;
+}
+
+.estimated-timers-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.estimated-timers-input:focus {
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Remove default number input arrows */
+.estimated-timers-input::-webkit-outer-spin-button,
+.estimated-timers-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.estimated-timers-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Custom larger arrows for number input */
+.estimated-timers-input {
+  position: relative;
+}
+
+.estimated-timers-input::after {
+  content: '';
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 0.5rem solid transparent;
+  border-right: 0.5rem solid transparent;
+  border-top: 0.5rem solid rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+
 .project-select {
   flex: 1;
   padding: 0.5rem;
@@ -226,6 +332,14 @@
   outline: none;
   transition: all 0.2s ease;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.5rem;
+  padding-right: 2.5rem;
 }
 
 .project-select option {
@@ -244,7 +358,7 @@
   border-radius: 0.5rem;
   background-color: transparent;
   color: #ffffff;
-  font-size: 2rem;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;

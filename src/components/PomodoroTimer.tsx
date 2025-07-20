@@ -171,11 +171,11 @@ const PomodoroTimer: React.FC = () => {
   useEffect(() => {
     const title = isRunning && !isPaused 
       ? mode === 'focus'
-        ? `▶︎ ${formatTime(timeLeft)} - Focus 🍅`
-        : `▶︎ ${formatTime(timeLeft)} - Break 🍅`
+        ? `🍅 ${formatTime(timeLeft)} - Focus`
+        : `💤 ${formatTime(timeLeft)} - Break`
       : isPaused 
-        ? `|| ${formatTime(timeLeft)} - Paused 🍅`
-        : `${formatTime(timeLeft)} - Idle 🍅`;
+        ? `⭕️ ${formatTime(timeLeft)} - Paused`
+        : `${formatTime(timeLeft)} - Idle`;
     
     document.title = title;
   }, [timeLeft, isRunning, isPaused]);
@@ -234,13 +234,36 @@ const PomodoroTimer: React.FC = () => {
           />
           {isTaskInputExpanded && newTaskText.trim() && (
             <div className="task-input-expanded">
-              <input
-                type="number"
-                value={estimatedTimers}
-                onChange={(e) => setEstimatedTimers(Number(e.target.value))}
-                placeholder="Estimated timers"
-                className="estimated-timers-input"
-              />
+              <div className="estimated-timers-container">
+                <div className="estimated-timers-label-container">
+                  <span className="estimated-timers-label">🍅 x </span>
+                </div>
+                <div className="estimated-timers-controls">
+                  
+                  <input
+                    type="number"
+                    value={estimatedTimers}
+                    onChange={(e) => setEstimatedTimers(Math.max(1, Number(e.target.value)))}
+                    placeholder="1"
+                    className="estimated-timers-input"
+                    min="1"
+                  />
+                  <button
+                    type="button"
+                    className="timer-control-btn"
+                    onClick={() => setEstimatedTimers(Math.max(1, estimatedTimers - 1))}
+                  >
+                    ➖
+                  </button>
+                  <button
+                    type="button"
+                    className="timer-control-btn"
+                    onClick={() => setEstimatedTimers(estimatedTimers + 1)}
+                  >
+                    ➕
+                  </button>
+                </div>
+              </div>
               <select
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
