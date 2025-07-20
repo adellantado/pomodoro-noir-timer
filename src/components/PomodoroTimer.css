@@ -78,11 +78,24 @@
 
 /* Timer Display */
 .timer-display {
-  margin: 2rem 0;
+  cursor: pointer;
+  padding: 1rem;
+  border-radius: 1rem;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.timer-display:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: scale(1.02);
+}
+
+.timer-display:active {
+  transform: scale(0.98);
 }
 
 .timer-text {
-  font-size: 8rem;
+  font-size: 10rem;
   font-weight: 700;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
   line-height: 1;
@@ -93,24 +106,8 @@
 .action-buttons {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
-}
-
-.start-button {
-  padding: 1rem 3rem;
-  border-radius: 2rem;
-  border: none;
-  background-color: #333333;
-  color: #ffffff;
-  font-size: 3rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-transform: capitalize;
-}
-
-.start-button:hover {
-  background-color: #444444;
 }
 
 .reset-button {
@@ -129,6 +126,7 @@
 
 .reset-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
 }
 
 /* Task Section */

@@ -179,16 +179,13 @@ const PomodoroTimer: React.FC = () => {
         </div>
 
         {/* Timer Display */}
-        <div className="timer-display">
+        <div className="timer-display" onClick={toggleTimer}>
           <span className="timer-text">{formatTime(timeLeft)}</span>
         </div>
 
         {/* Action Buttons */}
-        <div className="action-buttons">
-          <button className="start-button" onClick={toggleTimer}>
-            {isRunning && !isPaused ? 'Pause ⏸️' : 'Start ▶️'}
-          </button>
-        </div>
+        {/* <div className="action-buttons">
+        </div> */}
       </div>
 
       {/* Task List Section */}
