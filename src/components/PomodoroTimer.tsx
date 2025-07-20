@@ -21,6 +21,8 @@ const PomodoroTimer: React.FC = () => {
   const [isTaskInputExpanded, setIsTaskInputExpanded] = useState(false);
   const [estimatedTimers, setEstimatedTimers] = useState(1);
   const [selectedProject, setSelectedProject] = useState('');
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+  const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const focusTime = 25 * 60; // 25 minutes
@@ -126,6 +128,45 @@ const PomodoroTimer: React.FC = () => {
 
   const handleTaskInputClick = () => {
     setIsTaskInputExpanded(true);
+  };
+
+  // Drag and drop functions
+  const handleDragStart = (e: React.DragEvent, taskId: string) => {
+    e.dataTransfer.setData('text/plain', taskId);
+    (e.currentTarget as HTMLElement).style.opacity = '0.5';
+    setDraggedTaskId(taskId);
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    (e.currentTarget as HTMLElement).style.opacity = '1';
+    setDraggedTaskId(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    const targetTaskId = (e.currentTarget as HTMLElement).dataset.taskId;
+    if (targetTaskId) {
+      setDragOverTaskId(targetTaskId);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, targetTaskId: string) => {
+    e.preventDefault();
+    const draggedTaskId = e.dataTransfer.getData('text/plain');
+    
+    if (draggedTaskId === targetTaskId) return;
+
+    const draggedIndex = tasks.findIndex(task => task.id === draggedTaskId);
+    const targetIndex = tasks.findIndex(task => task.id === targetTaskId);
+    
+    if (draggedIndex === -1 || targetIndex === -1) return;
+
+    const newTasks = [...tasks];
+    const [draggedTask] = newTasks.splice(draggedIndex, 1);
+    newTasks.splice(targetIndex, 0, draggedTask);
+    
+    setTasks(newTasks);
+    setDragOverTaskId(null);
   };
 
   useEffect(() => {
@@ -287,7 +328,20 @@ const PomodoroTimer: React.FC = () => {
             <p className="no-tasks">No tasks yet. Add one above! ✨</p>
           ) : (
             tasks.map(task => (
-              <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+              <div
+                key={task.id}
+                className={`task-item ${task.completed ? 'completed' : ''} ${
+                  draggedTaskId === task.id ? 'dragging' : ''
+                } ${
+                  dragOverTaskId === task.id ? 'drag-over' : ''
+                }`}
+                draggable={true}
+                onDragStart={(e) => handleDragStart(e, task.id)}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, task.id)}
+                data-task-id={task.id}
+              >
                 <button
                   className="task-checkbox"
                   onClick={() => toggleTask(task.id)}
