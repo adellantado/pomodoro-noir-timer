@@ -257,6 +257,14 @@ const PomodoroTimer: React.FC = () => {
           <span className="timer-text">{formatTime(timeLeft)}</span>
         </div>
 
+        {/* Current Task Display */}
+        {topmostIncompleteTaskIndex !== -1 && (
+          <div className="current-task-display">
+            <span className="current-task-label">Current Focus:</span>
+            <span className="current-task-name">{tasks[topmostIncompleteTaskIndex].text}</span>
+          </div>
+        )}
+
         {/* Action Buttons */}
         {/* <div className="action-buttons">
         </div> */}
