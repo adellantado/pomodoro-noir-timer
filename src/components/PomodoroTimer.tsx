@@ -17,7 +17,11 @@ const PomodoroTimer: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes in seconds
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    // Try to load from localStorage, otherwise use empty array
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [newTaskText, setNewTaskText] = useState('');
   const [isTaskInputExpanded, setIsTaskInputExpanded] = useState(false);
   const [estimatedTimers, setEstimatedTimers] = useState(1);
@@ -35,6 +39,11 @@ const PomodoroTimer: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('projects', JSON.stringify(projects));
   }, [projects]);
+
+  // Save tasks to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
   const [newProjectName, setNewProjectName] = useState('');
   const [isAddingProject, setIsAddingProject] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -277,10 +286,10 @@ const PomodoroTimer: React.FC = () => {
   useEffect(() => {
     const title = isRunning && !isPaused 
       ? mode === 'focus'
-        ? `🍅 ${formatTime(timeLeft)} - Focus`
-        : `💤 ${formatTime(timeLeft)} - Break`
+        ? `${formatTime(timeLeft)} - Focus`
+        : `${formatTime(timeLeft)} - Break`
       : isPaused 
-        ? `⭕️ ${formatTime(timeLeft)} - Paused`
+        ? `${formatTime(timeLeft)} - Paused`
         : `${formatTime(timeLeft)} - Idle`;
     
     document.title = title;
@@ -292,7 +301,7 @@ const PomodoroTimer: React.FC = () => {
       <div className="header">
         <div className="brand">
           <h1 className="brand-title">pomodoro noir 🍅</h1>
-          <p className="brand-subtitle">dark themed deep focus</p>
+          <p className="brand-subtitle">elegant focus timer</p>
         </div>
       </div>
 
