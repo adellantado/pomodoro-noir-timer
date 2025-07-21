@@ -352,8 +352,14 @@
   pointer-events: none;
 }
 
-.project-select {
+/* Custom Project Dropdown */
+.project-dropdown-container {
   flex: 1;
+  position: relative;
+}
+
+.project-dropdown-button {
+  width: 100%;
   padding: 0.5rem;
   border: 1px solid #333333;
   border-radius: 0.5rem;
@@ -363,24 +369,177 @@
   outline: none;
   transition: all 0.2s ease;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 1.5rem;
-  padding-right: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
 }
 
-.project-select option {
+.project-dropdown-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+}
+
+.dropdown-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.project-dropdown-container.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.project-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
   background-color: #000000;
+  border: 1px solid #333333;
+  border-radius: 0.5rem;
+  margin-top: 0.25rem;
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.project-option-container {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+.project-option {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  background-color: transparent;
+  color: #ffffff;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0.25rem;
+}
+
+.project-option:hover {
+  background-color: #ff6666;
   color: #ffffff;
 }
 
-.project-select:focus {
+.project-option.selected {
+  background-color: #ff4444;
+  color: #ffffff;
+}
+
+.remove-project-btn {
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 0.25rem;
+  opacity: 0;
+}
+
+.project-option-container:hover .remove-project-btn {
+  opacity: 1;
+}
+
+.remove-project-btn:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+  color: #ff6666;
+}
+
+.add-project-section {
+  border-top: 1px solid #333333;
+  padding: 0.5rem;
+}
+
+.add-project-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px dashed #666666;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0.25rem;
+  text-align: center;
+}
+
+.add-project-btn:hover {
+  border-color: #ffffff;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.add-project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.new-project-input {
+  padding: 0.5rem;
+  border: 1px solid #333333;
+  border-radius: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.new-project-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.new-project-input:focus {
   border-color: #ffffff;
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.add-project-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.confirm-add-btn,
+.cancel-add-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #333333;
+  border-radius: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirm-add-btn:hover {
+  background-color: rgba(0, 255, 0, 0.2);
+  border-color: #00ff00;
+}
+
+.cancel-add-btn:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+  border-color: #ff0000;
+}
+
+/* Remove old select styles */
+.project-select {
+  display: none;
 }
 
 .add-task-button {

@@ -24,13 +24,26 @@ const PomodoroTimer: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState('');
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
+  const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
+  const [projects, setProjects] = useState(() => {
+    // Try to load from localStorage, otherwise use default
+    const saved = localStorage.getItem('projects');
+    return saved ? JSON.parse(saved) : ['Work', 'Study', 'Other'];
+  });
+
+  // Save projects to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('projects', JSON.stringify(projects));
+  }, [projects]);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [isAddingProject, setIsAddingProject] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const focusTime = 25 * 60; // 25 minutes
   const restTime = 5 * 60; // 5 minutes
 
   // Sample projects - you can expand this
-  const projects = ['Work', 'Study', 'Personal', 'Health', 'Learning', 'Other'];
+  // const projects = ['Work', 'Study', 'Personal', 'Health', 'Learning', 'Other'];
 
   // Function to play notification sound
   const playNotificationSound = useCallback(() => {
@@ -130,6 +143,31 @@ const PomodoroTimer: React.FC = () => {
 
   const handleTaskInputClick = () => {
     setIsTaskInputExpanded(true);
+  };
+
+  // Project management functions
+  const addProject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newProjectName.trim() && !projects.includes(newProjectName.trim())) {
+      setProjects([...projects, newProjectName.trim()]);
+      setNewProjectName('');
+      setIsAddingProject(false);
+    }
+  };
+
+  const removeProject = (projectToRemove: string) => {
+    // Don't allow removing if it's currently selected
+    if (selectedProject === projectToRemove) {
+      setSelectedProject('');
+    }
+    setProjects(projects.filter((project: string) => project !== projectToRemove));
+  };
+
+  const toggleAddProject = () => {
+    setIsAddingProject(!isAddingProject);
+    if (!isAddingProject) {
+      setNewProjectName('');
+    }
   };
 
   // Find the topmost incomplete task
@@ -340,16 +378,96 @@ const PomodoroTimer: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <select
-                value={selectedProject}
-                onChange={(e) => setSelectedProject(e.target.value)}
-                className="project-select"
-              >
-                <option value="">Select a project</option>
-                {projects.map(project => (
-                  <option key={project} value={project}>{project}</option>
-                ))}
-              </select>
+              <div className="project-dropdown-container">
+                <button
+                  type="button"
+                  className="project-dropdown-button"
+                  onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
+                >
+                  {selectedProject || "Select project"}
+                  <span className="dropdown-arrow">▼</span>
+                </button>
+                {isProjectDropdownOpen && (
+                  <div className="project-dropdown-menu">
+                    {projects.map((project: string) => (
+                      <div key={project} className="project-option-container">
+                        <button
+                          type="button"
+                          className={`project-option ${selectedProject === project ? 'selected' : ''}`}
+                          onClick={() => {
+                            setSelectedProject(project);
+                            setIsProjectDropdownOpen(false);
+                          }}
+                        >
+                          {project}
+                        </button>
+                        <button
+                          type="button"
+                          className="remove-project-btn"
+                          onClick={() => removeProject(project)}
+                          title="Remove project"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    ))}
+                    <div className="add-project-section">
+                      {isAddingProject ? (
+                        <div className="add-project-form">
+                          <input
+                            type="text"
+                            value={newProjectName}
+                            onChange={(e) => setNewProjectName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                if (newProjectName.trim() && !projects.includes(newProjectName.trim())) {
+                                  setProjects([...projects, newProjectName.trim()]);
+                                  setNewProjectName('');
+                                  setIsAddingProject(false);
+                                }
+                              }
+                            }}
+                            placeholder="New project name"
+                            className="new-project-input"
+                            autoFocus
+                          />
+                          <div className="add-project-buttons">
+                            <button 
+                              type="button"
+                              className="confirm-add-btn"
+                              onClick={() => {
+                                if (newProjectName.trim() && !projects.includes(newProjectName.trim())) {
+                                  setProjects([...projects, newProjectName.trim()]);
+                                  setNewProjectName('');
+                                  setIsAddingProject(false);
+                                }
+                              }}
+                            >
+                              ➕
+                            </button>
+                            <button 
+                              type="button" 
+                              className="cancel-add-btn"
+                              onClick={toggleAddProject}
+                            >
+                              ❌
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="add-project-btn"
+                          onClick={toggleAddProject}
+                        >
+                          ➕ Add Project
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
               <button type="submit" className="add-task-button">
                 ➕
               </button>
