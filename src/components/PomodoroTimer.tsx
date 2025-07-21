@@ -414,25 +414,25 @@ const PomodoroTimer: React.FC = () => {
                     <div className="add-project-section">
                       {isAddingProject ? (
                         <div className="add-project-form">
-                          <input
-                            type="text"
-                            value={newProjectName}
-                            onChange={(e) => setNewProjectName(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                if (newProjectName.trim() && !projects.includes(newProjectName.trim())) {
-                                  setProjects([...projects, newProjectName.trim()]);
-                                  setNewProjectName('');
-                                  setIsAddingProject(false);
+                          <div className="new-project-input-container">
+                            <input
+                              type="text"
+                              value={newProjectName}
+                              onChange={(e) => setNewProjectName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  if (newProjectName.trim() && !projects.includes(newProjectName.trim())) {
+                                    setProjects([...projects, newProjectName.trim()]);
+                                    setNewProjectName('');
+                                    setIsAddingProject(false);
+                                  }
                                 }
-                              }
-                            }}
-                            placeholder="New project name"
-                            className="new-project-input"
-                            autoFocus
-                          />
-                          <div className="add-project-buttons">
+                              }}
+                              placeholder="New project name"
+                              className="new-project-input"
+                              autoFocus
+                            />
                             <button 
                               type="button"
                               className="confirm-add-btn"
@@ -445,13 +445,6 @@ const PomodoroTimer: React.FC = () => {
                               }}
                             >
                               ➕
-                            </button>
-                            <button 
-                              type="button" 
-                              className="cancel-add-btn"
-                              onClick={toggleAddProject}
-                            >
-                              ❌
                             </button>
                           </div>
                         </div>

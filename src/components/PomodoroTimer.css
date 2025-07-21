@@ -461,7 +461,6 @@
 
 .add-project-section {
   border-top: 1px solid #333333;
-  padding: 0.5rem;
 }
 
 .add-project-btn {
@@ -489,7 +488,14 @@
   gap: 0.5rem;
 }
 
+.new-project-input-container {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .new-project-input {
+  flex: 1;
   padding: 0.5rem;
   border: 1px solid #333333;
   border-radius: 0.25rem;
@@ -498,6 +504,7 @@
   font-size: 0.9rem;
   outline: none;
   transition: all 0.2s ease;
+  margin: 4px;
 }
 
 .new-project-input::placeholder {
@@ -509,15 +516,9 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.add-project-buttons {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.confirm-add-btn,
-.cancel-add-btn {
-  flex: 1;
-  padding: 0.5rem;
+.confirm-add-btn {
+  width: 2rem;
+  height: 2.15rem;
   border: 1px solid #333333;
   border-radius: 0.25rem;
   background-color: rgba(255, 255, 255, 0.05);
@@ -525,16 +526,16 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 4px 4px 4px 0px;
 }
 
 .confirm-add-btn:hover {
   background-color: rgba(0, 255, 0, 0.2);
   border-color: #00ff00;
-}
-
-.cancel-add-btn:hover {
-  background-color: rgba(255, 0, 0, 0.2);
-  border-color: #ff0000;
 }
 
 /* Remove old select styles */
