@@ -9,6 +9,7 @@ interface Task {
   completed: boolean;
   estimatedTimers?: number;
   project?: string;
+  finishedTimers: number;
 }
 
 const PomodoroTimer: React.FC = () => {
@@ -106,7 +107,8 @@ const PomodoroTimer: React.FC = () => {
         text: newTaskText.trim(),
         completed: false,
         estimatedTimers: estimatedTimers,
-        project: selectedProject || undefined
+        project: selectedProject || undefined,
+        finishedTimers: 0,
       };
       setTasks([...tasks, newTask]);
       setNewTaskText('');
@@ -182,8 +184,30 @@ const PomodoroTimer: React.FC = () => {
             setIsRunning(false);
             setIsPaused(false);
             
-            // Play notification sound when timer ends
-            playNotificationSound();
+            // This line may be triggered twice because setTimeLeft is called in a setInterval,
+            // and when prev <= 1, the callback is executed, but React's state batching and
+            // asynchronous updates can cause the effect to run more than once before the interval is cleared.
+            // To prevent double-triggering, you can add a guard to only play the sound when timeLeft actually reaches 0.
+            if (prev === 1) {
+              // Prevent double-triggering by using a ref as a guard
+              if (!(window as any).__pomodoroTimerEnds) {
+                // Play notification sound when timer ends
+                playNotificationSound();
+                (window as any).__pomodoroTimerEnds = true;
+                setTimeout(() => { (window as any).__pomodoroTimerEnds = false; }, 1000); // reset after 1s
+            
+                // Increment finishedTimers for topmost incomplete task if in focus mode
+                if (mode === 'focus' && topmostIncompleteTaskIndex !== -1) {
+                  setTasks(prevTasks => 
+                    prevTasks.map((task, index) => 
+                      index === topmostIncompleteTaskIndex 
+                        ? { ...task, finishedTimers: task.finishedTimers + 1 }
+                        : task
+                    )
+                  );
+                }
+              }
+            }
             
             // Auto-switch to rest mode when focus timer ends
             if (mode === 'focus') {
@@ -230,7 +254,7 @@ const PomodoroTimer: React.FC = () => {
       <div className="header">
         <div className="brand">
           <h1 className="brand-title">pomodoro noir 🍅</h1>
-          <p className="brand-subtitle">open focus advisor</p>
+          <p className="brand-subtitle">dark themed deep focus</p>
         </div>
       </div>
 
@@ -362,10 +386,10 @@ const PomodoroTimer: React.FC = () => {
                 </button>
                 <div className="task-content">
                   <span className="task-text">{task.text}</span>
-                  {(task.estimatedTimers || task.project) && (
+                  {(task.estimatedTimers || task.project || task.finishedTimers > 0) && (
                     <div className="task-meta">
                       {task.estimatedTimers && (
-                        <span className="task-estimate">🍅 {task.estimatedTimers}</span>
+                        <span className="task-estimate">🍅 {task.finishedTimers}/{task.estimatedTimers}</span>
                       )}
                       {task.project && (
                         <span className="task-project">📁 {task.project}</span>
@@ -386,11 +410,11 @@ const PomodoroTimer: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <div className="footer">
+      {/* <div className="footer">
         <button className="icon-button">
         ⚙️
-        </button>
-      </div>
+        </button> 
+      </div> */}
     </div>
   );
 };
