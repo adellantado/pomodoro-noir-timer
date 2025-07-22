@@ -10,6 +10,7 @@ interface Task {
   estimatedTimers?: number;
   project?: string;
   finishedTimers: number;
+  savedTimerValue?: number; // New field to store saved timer value
 }
 
 const PomodoroTimer: React.FC = () => {
@@ -29,6 +30,7 @@ const PomodoroTimer: React.FC = () => {
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
   const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
+  const [currentActiveTaskId, setCurrentActiveTaskId] = useState<string | null>(null);
   const [projects, setProjects] = useState(() => {
     // Try to load from localStorage, otherwise use default
     const saved = localStorage.getItem('projects');
@@ -182,6 +184,76 @@ const PomodoroTimer: React.FC = () => {
   // Find the topmost incomplete task
   const topmostIncompleteTaskIndex = tasks.findIndex(task => !task.completed);
 
+  // Function to save current timer value to a task
+  const saveTimerToTask = (taskId: string) => {
+    // Don't save if timer is at default values (25:00 for focus, 00:00 for rest)
+    const defaultTime = mode === 'focus' ? focusTime : restTime;
+    if (timeLeft === defaultTime) {
+      return;
+    }
+    
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === taskId 
+          ? { ...task, savedTimerValue: timeLeft }
+          : task
+      )
+    );
+  };
+
+  // Function to restore timer value from a task
+  const restoreTimerFromTask = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (task && task.savedTimerValue !== undefined) {
+      setTimeLeft(task.savedTimerValue);
+      // Don't reset the saved value - keep it for future reference
+    } else {
+      // If no saved value, reset to default
+      setTimeLeft(mode === 'focus' ? focusTime : restTime);
+    }
+  };
+
+  // Function to handle task switching when topmost task changes
+  const handleTaskSwitch = (newTopmostTaskId: string | null) => {
+    // If there was a previous active task, save its timer value
+    if (currentActiveTaskId && currentActiveTaskId !== newTopmostTaskId) {
+      saveTimerToTask(currentActiveTaskId);
+    }
+
+    // Stop the timer when switching tasks
+    setIsRunning(false);
+    setIsPaused(false);
+
+    // Set new active task
+    setCurrentActiveTaskId(newTopmostTaskId);
+
+    // If there's a new topmost task, restore its timer value
+    if (newTopmostTaskId) {
+      restoreTimerFromTask(newTopmostTaskId);
+    }
+  };
+
+  // Effect to handle task switching when topmost task changes
+  useEffect(() => {
+    const newTopmostTask = topmostIncompleteTaskIndex !== -1 ? tasks[topmostIncompleteTaskIndex] : null;
+    const newTopmostTaskId = newTopmostTask?.id || null;
+    
+    if (newTopmostTaskId !== currentActiveTaskId) {
+      handleTaskSwitch(newTopmostTaskId);
+    }
+  }, [topmostIncompleteTaskIndex, tasks]);
+
+  // Effect to initialize timer on page reload
+  useEffect(() => {
+    if (topmostIncompleteTaskIndex !== -1 && !currentActiveTaskId) {
+      const topmostTask = tasks[topmostIncompleteTaskIndex];
+      if (topmostTask.savedTimerValue !== undefined) {
+        setTimeLeft(topmostTask.savedTimerValue);
+        setCurrentActiveTaskId(topmostTask.id);
+      }
+    }
+  }, [tasks, topmostIncompleteTaskIndex, currentActiveTaskId]);
+
   // Drag and drop functions
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
     e.dataTransfer.setData('text/plain', taskId);
@@ -265,6 +337,24 @@ const PomodoroTimer: React.FC = () => {
               return focusTime;
             }
           }
+          
+          // Save timer value every 10 seconds to topmost incomplete task
+          if (topmostIncompleteTaskIndex !== -1 && prev % 10 === 0) {
+            const taskId = tasks[topmostIncompleteTaskIndex].id;
+            const defaultTime = mode === 'focus' ? focusTime : restTime;
+            
+            // Only save if timer is not at default value
+            if (prev !== defaultTime) {
+              setTasks(prevTasks => 
+                prevTasks.map(task => 
+                  task.id === taskId 
+                    ? { ...task, savedTimerValue: prev }
+                    : task
+                )
+              );
+            }
+          }
+          
           return prev - 1;
         });
       }, 1000);
@@ -506,13 +596,16 @@ const PomodoroTimer: React.FC = () => {
                 </button>
                 <div className="task-content">
                   <span className="task-text">{task.text}</span>
-                  {(task.estimatedTimers || task.project || task.finishedTimers > 0) && (
+                  {(task.estimatedTimers || task.project || task.finishedTimers > 0 || (task.savedTimerValue && tasks.indexOf(task) !== topmostIncompleteTaskIndex)) && (
                     <div className="task-meta">
                       {task.estimatedTimers && (
                         <span className="task-estimate">🍅 {task.finishedTimers}/{task.estimatedTimers}</span>
                       )}
                       {task.project && (
                         <span className="task-project">📁 {task.project}</span>
+                      )}
+                      {task.savedTimerValue && tasks.indexOf(task) !== topmostIncompleteTaskIndex && (
+                        <span className="task-saved-timer">⏱️ {formatTime(task.savedTimerValue)}</span>
                       )}
                     </div>
                   )}
