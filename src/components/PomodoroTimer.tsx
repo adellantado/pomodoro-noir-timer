@@ -236,7 +236,7 @@ const PomodoroTimer: React.FC = () => {
   // Effect to handle task switching when topmost task changes
   useEffect(() => {
     const newTopmostTask = topmostIncompleteTaskIndex !== -1 ? tasks[topmostIncompleteTaskIndex] : null;
-    const newTopmostTaskId = newTopmostTask?.id || null;
+    const newTopmostTaskId = newTopmostTask? newTopmostTask.id : null;
     
     if (newTopmostTaskId !== currentActiveTaskId) {
       handleTaskSwitch(newTopmostTaskId);
