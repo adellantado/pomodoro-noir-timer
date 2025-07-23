@@ -612,8 +612,8 @@
 .task-item::before {
   content: '⋮⋮';
   position: absolute;
-  left: 0.5rem;
-  top: 50%;
+  left: 0.85rem;
+  top: 70%;
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.3);
   font-size: 0.8rem;
