@@ -338,10 +338,10 @@ const PomodoroTimer: React.FC = () => {
             }
           }
           
-          // Save timer value every 10 seconds to topmost incomplete task
-          if (topmostIncompleteTaskIndex !== -1 && prev % 10 === 0) {
+          // Save timer value every 10 seconds to topmost incomplete task ONLY in focus mode
+          if (mode === 'focus' && topmostIncompleteTaskIndex !== -1 && prev % 10 === 0) {
             const taskId = tasks[topmostIncompleteTaskIndex].id;
-            const defaultTime = mode === 'focus' ? focusTime : restTime;
+            const defaultTime = focusTime;
             
             // Only save if timer is not at default value
             if (prev !== defaultTime) {
@@ -363,7 +363,7 @@ const PomodoroTimer: React.FC = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning, isPaused, timeLeft, mode, focusTime, restTime, playNotificationSound]);
+  }, [isRunning, isPaused, timeLeft, mode, focusTime, restTime, playNotificationSound, topmostIncompleteTaskIndex, tasks]);
 
   // Request notification permission on component mount
   useEffect(() => {
