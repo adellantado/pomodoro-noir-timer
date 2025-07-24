@@ -119,7 +119,14 @@ const PomodoroTimer: React.FC = () => {
     setMode(newMode);
     setIsRunning(false);
     setIsPaused(false);
-    setTimeLeft(newMode === 'focus' ? focusTime : restTime);
+    
+    // If switching to focus mode and there's an active task, restore its saved timer value
+    if (newMode === 'focus' && currentActiveTaskId) {
+      restoreTimerFromTask(currentActiveTaskId);
+    } else {
+      // For rest mode or when no active task, use default time
+      setTimeLeft(newMode === 'focus' ? focusTime : restTime);
+    }
   };
 
   // Task management functions
