@@ -100,12 +100,6 @@ const PomodoroTimer: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const resetTimer = useCallback(() => {
-    setIsRunning(false);
-    setIsPaused(false);
-    setTimeLeft(mode === 'focus' ? focusTime : restTime);
-  }, [mode, focusTime, restTime]);
-
   const toggleTimer = () => {
     if (isRunning) {
       setIsPaused(!isPaused);
@@ -116,18 +110,44 @@ const PomodoroTimer: React.FC = () => {
   };
 
   const switchMode = (newMode: TimerMode) => {
+    // store the timer value
+    if (newMode === 'rest' && timeLeft !== focusTime && currentActiveTaskId) {
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === currentActiveTaskId 
+            ? { ...task, savedTimerValue: timeLeft }
+            : task
+        )
+      );
+    }
+    
     setMode(newMode);
+
     setIsRunning(false);
     setIsPaused(false);
-    
-    // If switching to focus mode and there's an active task, restore its saved timer value
-    if (newMode === 'focus' && currentActiveTaskId) {
-      restoreTimerFromTask(currentActiveTaskId);
-    } else {
-      // For rest mode or when no active task, use default time
-      setTimeLeft(newMode === 'focus' ? focusTime : restTime);
-    }
+
   };
+
+  // Move restoreTimerFromTask logic to a useEffect that runs when mode or currentActiveTaskId changes
+  useEffect(() => {
+    restoreTimerFromTask(currentActiveTaskId? currentActiveTaskId : '');
+    // if (mode !== 'focus') {
+    //   setTimeLeft(restTime);
+    //   return;
+    // }
+    // if (mode === 'focus' && currentActiveTaskId) {
+    //   // Restore timer value from the current active task
+    //   const task = tasks.find(t => t.id === currentActiveTaskId);
+    //   if (task && task.savedTimerValue !== undefined) {
+    //     setTimeLeft(task.savedTimerValue);
+    //   } else {
+    //     setTimeLeft(focusTime);
+    //   }
+    // } else {
+    //   setTimeLeft(focusTime);
+    // }
+  // Only run when mode, currentActiveTaskId, tasks, or focusTime changes
+  }, [mode]);
 
   // Task management functions
   const addTask = (e: React.FormEvent) => {
@@ -193,9 +213,13 @@ const PomodoroTimer: React.FC = () => {
 
   // Function to save current timer value to a task
   const saveTimerToTask = (taskId: string) => {
-    // Don't save if timer is at default values (25:00 for focus, 00:00 for rest)
-    const defaultTime = mode === 'focus' ? focusTime : restTime;
-    if (timeLeft === defaultTime) {
+    // Don't save if not in focus mode
+    if (mode !== 'focus') {
+      return;
+    }
+    
+    // Don't save if timer is at default values (25:00 for focus)
+    if (timeLeft === focusTime) {
       return;
     }
     
@@ -210,18 +234,31 @@ const PomodoroTimer: React.FC = () => {
 
   // Function to restore timer value from a task
   const restoreTimerFromTask = (taskId: string) => {
+    // Don't restore if not in focus mode
+    if (mode !== 'focus') {
+      setTimeLeft(restTime);
+      return;
+    }
+    
     const task = tasks.find(t => t.id === taskId);
     if (task && task.savedTimerValue !== undefined) {
       setTimeLeft(task.savedTimerValue);
       // Don't reset the saved value - keep it for future reference
     } else {
-      // If no saved value, reset to default
-      setTimeLeft(mode === 'focus' ? focusTime : restTime);
+      // If no saved value, reset to default focus time
+      setTimeLeft(focusTime);
     }
   };
 
   // Function to handle task switching when topmost task changes
   const handleTaskSwitch = (newTopmostTaskId: string | null) => {
+    // Only handle task switching in focus mode
+    if (mode !== 'focus') {
+      // Set new active task
+      setCurrentActiveTaskId(newTopmostTaskId);
+      return;
+    }
+    
     // If there was a previous active task, save its timer value
     if (currentActiveTaskId && currentActiveTaskId !== newTopmostTaskId) {
       saveTimerToTask(currentActiveTaskId);
@@ -242,16 +279,26 @@ const PomodoroTimer: React.FC = () => {
 
   // Effect to handle task switching when topmost task changes
   useEffect(() => {
+    // Only handle task switching in focus mode
+    // if (mode !== 'focus') {
+    //   return;
+    // }
+    
     const newTopmostTask = topmostIncompleteTaskIndex !== -1 ? tasks[topmostIncompleteTaskIndex] : null;
     const newTopmostTaskId = newTopmostTask? newTopmostTask.id : null;
     
     if (newTopmostTaskId !== currentActiveTaskId) {
       handleTaskSwitch(newTopmostTaskId);
     }
-  }, [topmostIncompleteTaskIndex, tasks]);
+  }, [topmostIncompleteTaskIndex, tasks, currentActiveTaskId]);
 
   // Effect to initialize timer on page reload
   useEffect(() => {
+    // Only initialize task timer in focus mode
+    if (mode !== 'focus') {
+      return;
+    }
+    
     if (topmostIncompleteTaskIndex !== -1 && !currentActiveTaskId) {
       const topmostTask = tasks[topmostIncompleteTaskIndex];
       if (topmostTask.savedTimerValue !== undefined) {
@@ -259,7 +306,7 @@ const PomodoroTimer: React.FC = () => {
         setCurrentActiveTaskId(topmostTask.id);
       }
     }
-  }, [tasks, topmostIncompleteTaskIndex, currentActiveTaskId]);
+  }, [tasks, topmostIncompleteTaskIndex]);
 
   // Drag and drop functions
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
@@ -370,7 +417,7 @@ const PomodoroTimer: React.FC = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning, isPaused, timeLeft, mode, focusTime, restTime, playNotificationSound, topmostIncompleteTaskIndex, tasks]);
+  }, [isRunning, isPaused, timeLeft, focusTime, restTime, playNotificationSound, topmostIncompleteTaskIndex, tasks]);
 
   // Request notification permission on component mount
   useEffect(() => {
